@@ -119,9 +119,15 @@ class FeishuChannel implements Channel {
       // Start WebSocket connection
       this.wsClient.start({ eventDispatcher });
       this.connected = true;
-      logger.info({ channel: 'feishu' }, 'Feishu channel connected via WebSocket');
+      logger.info(
+        { channel: 'feishu' },
+        'Feishu channel connected via WebSocket',
+      );
     } catch (err) {
-      logger.error({ err, channel: 'feishu' }, 'Failed to connect Feishu channel');
+      logger.error(
+        { err, channel: 'feishu' },
+        'Failed to connect Feishu channel',
+      );
       throw err;
     }
   }
@@ -176,18 +182,24 @@ class FeishuChannel implements Channel {
         const parsed = JSON.parse(message.content || '{}');
         const sections = parsed.zh_cn?.content || parsed.en_us?.content || [];
         content = sections
-          .flatMap((section: Array<{ text?: string }>) => section.map((el) => el.text || ''))
+          .flatMap((section: Array<{ text?: string }>) =>
+            section.map((el) => el.text || ''),
+          )
           .join('');
       }
     } catch {
-      logger.warn({ messageType: message.message_type }, 'Failed to parse Feishu message content');
+      logger.warn(
+        { messageType: message.message_type },
+        'Failed to parse Feishu message content',
+      );
       return;
     }
 
     if (!content) return;
 
     // Get sender info
-    const senderId = sender?.sender_id?.open_id ||
+    const senderId =
+      sender?.sender_id?.open_id ||
       sender?.sender_id?.union_id ||
       sender?.sender_id?.user_id ||
       'unknown';
@@ -202,7 +214,9 @@ class FeishuChannel implements Channel {
       sender: senderId,
       sender_name: senderId,
       content,
-      timestamp: new Date(parseInt(message.create_time || Date.now().toString())).toISOString(),
+      timestamp: new Date(
+        parseInt(message.create_time || Date.now().toString()),
+      ).toISOString(),
       is_from_me: false,
       is_bot_message: false,
     };
